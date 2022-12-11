@@ -55,7 +55,48 @@ private:
 template<class Type>
 void Dijkstra(Type* dist, int* prev, const int& v, const LowerTriangularMatrix<Type>& c)
 {
-    
+    bool *s = new bool[c.size()]; // 表示是否加入集合S的数组
+    // 初始化dist
+    for (int i = 0; i < c.size(); i++)
+    {
+        dist[i] = c.at(v, i);
+        s[i] = false;
+        if (dist[i] == INT_MAX)
+            prev[i] = 0;
+        else
+            prev[i] = v;
+    }
+    dist[v] = 0;
+    s[v] = true;
+    for (int i = 0; i < c.size(); i++)
+    {
+        // 查找不在集合S且dist最小的结点
+        int temp = INT_MAX;
+        int u = v;
+        for (int j = 0; j < c.size(); j++)
+        {
+            if ((!s[j]) && (dist[j] < temp))
+            {
+                u = j;
+                temp = dist[j];
+            }
+        }
+        s[u] = true; // 将不在集合S且dist最小的结点加入S
+        // 修改因u加入导致的dist数组的改变
+        for (int j = 0; j < c.size(); j++)
+        {
+            if ((!s[j]) && (c.at(u, v) < INT_MAX))
+            {
+                Type newdist = dist[u] + c.at(u, v);
+                if (newdist < dist[j])
+                {
+                    dist[j] = newdist;
+                    prev[j] = u;
+                }
+            }
+        }
+    }
+    delete[] s;   
 }
 
 int main()
